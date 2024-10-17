@@ -1,0 +1,186 @@
+{# templates/home/index.html.twig #}
+{% extends 'base.html.twig' %}
+
+{% block title %}Accueil - API Pokémon{% endblock %}
+
+{% block stylesheets %}
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f8f9fa; /* Couleur de fond agréable pour le corps */
+            font-family: 'Arial', sans-serif; /* Police de caractères */
+        }
+        
+        .navbar {
+            background-color: #007bff; /* Couleur de fond de la barre de navigation */
+        }
+
+        .navbar-brand, .nav-link {
+            color: #ffffff !important; /* Couleur blanche pour le texte de la barre de navigation */
+        }
+
+        .nav-link:hover {
+            color: #ffcc00 !important; /* Couleur au survol des liens de navigation */
+        }
+
+        .container {
+            margin-top: 30px; /* Marge supérieure pour le conteneur principal */
+            margin-bottom: 30px; /* Marge inférieure pour le conteneur principal */
+        }
+
+        h1 {
+            color: #343a40; /* Couleur du titre principal */
+        }
+
+        .carousel-control-prev-icon, .carousel-control-next-icon {
+            background-color: #007bff; /* Fond des icônes de contrôle du carousel */
+            border-radius: 50%; /* Coins arrondis pour les boutons de contrôle */
+        }
+
+        .carousel-control-prev, .carousel-control-next {
+            filter: brightness(1.2); /* Rendre les boutons de contrôle plus visibles */
+        }
+
+        .card {
+            border: 1px solid #007bff; /* Bordure des cartes Pokémon */
+            border-radius: 15px; /* Coins arrondis des cartes */
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Ombre pour un effet de profondeur */
+            transition: transform 0.2s; /* Transition douce lors du survol des cartes */
+        }
+
+        .card:hover {
+            transform: scale(1.05); /* Agrandissement des cartes au survol */
+        }
+
+        .search-bar {
+            margin-bottom: 20px; /* Marge inférieure pour la barre de recherche */
+        }
+    </style>
+{% endblock %}
+
+{% block body %}
+<header>
+    <nav class="navbar navbar-expand-lg navbar-light">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="#">Pokémon API</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav">
+                    <li class="nav-item">
+                        <a class="nav-link active" aria-current="page" href="#">Accueil</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">Pokémons</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">À propos</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+</header>
+
+<div class="container mt-4">
+    <h1 class="text-center">Liste des Pokémon par Type</h1>
+
+    <!-- Barre de recherche pour filtrer les Pokémon par nom -->
+    <div class="search-bar">
+        <input type="text" id="searchInput" class="form-control" placeholder="Rechercher un Pokémon par nom...">
+    </div>
+
+    <div id="carousels-container">
+        <!-- Les carousels de Pokémon seront ajoutés dynamiquement ici -->
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Appel à l'API pour récupérer les Pokémon
+        fetch('/api/pokemons') // URL de l'API pour récupérer les Pokémon
+            .then(response => response.json()) // Conversion de la réponse en JSON
+            .then(data => {
+                const carouselsContainer = document.getElementById('carousels-container'); // Conteneur des carousels
+                const groupedPokemons = {}; // Objet pour regrouper les Pokémon par type
+
+                // Regrouper les Pokémon par type
+                data['hydra:member'].forEach(pokemon => {
+                    const type = pokemon.type;
+
+                    if (!groupedPokemons[type]) {
+                        groupedPokemons[type] = []; // Initialiser un tableau pour un nouveau type
+                    }
+                    groupedPokemons[type].push(pokemon); // Ajouter le Pokémon au type correspondant
+                });
+
+                // Créer un carousel pour chaque type de Pokémon
+                for (const type in groupedPokemons) {
+                    const pokemons = groupedPokemons[type];
+                    let items = ''; // Initialise une chaîne pour contenir les items du carousel
+
+                    pokemons.forEach((pokemon, index) => {
+                        const activeClass = index % 15 === 0 ? 'active' : ''; // Rendre le premier item actif
+
+                        if (index % 15 === 0) {
+                            items += `<div class="carousel-item ${activeClass}"><div class="row">`; // Ouvrir un nouvel item de carousel
+                        }
+
+                        // Créer une carte pour chaque Pokémon (4 par ligne)
+                        items += `
+                            <div class="col-md-3">
+                                <a href="/pokemon/${pokemon.name}" class="text-decoration-none">
+                                    <div class="card mb-3">
+                                        <img src="${pokemon.image}" class="card-img-top" alt="${pokemon.name}">
+                                        <div class="card-body">
+                                            <h5 class="card-title">${pokemon.name}</h5>
+                                            <p class="card-text">Type: ${pokemon.type}</p>
+                                            <p class="card-text">Abilities: ${pokemon.abilities.join(', ')}</p>
+                                        </div>
+                                    </div>
+                                </a>
+                            </div>
+                        `;
+
+                        if ((index + 1) % 15 === 0 || index === pokemons.length - 1) {
+                            items += `</div></div>`; // Fermer la ligne et l'item de carousel
+                        }
+                    });
+
+                    // Ajouter le carousel pour ce type de Pokémon
+                    carouselsContainer.innerHTML += `
+                        <h2 class="text-center">${type.charAt(0).toUpperCase() + type.slice(1)} Pokémon</h2>
+                        <div id="carousel-${type}" class="carousel slide mt-4" data-bs-ride="carousel">
+                            <div class="carousel-inner">
+                                ${items}
+                            </div>
+                            <button class="carousel-control-prev" type="button" data-bs-target="#carousel-${type}" data-bs-slide="prev">
+                                <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                                <span class="visually-hidden">Précédent</span>
+                            </button>
+                            <button class="carousel-control-next" type="button" data-bs-target="#carousel-${type}" data-bs-slide="next">
+                                <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                                <span class="visually-hidden">Suivant</span>
+                            </button>
+                        </div>
+                    `;
+                }
+
+                // Fonction de recherche pour filtrer les Pokémon affichés
+                const searchInput = document.getElementById('searchInput');
+                searchInput.addEventListener('keyup', function() {
+                    const query = this.value.toLowerCase(); // Récupérer la valeur de recherche
+                    const cards = carouselsContainer.getElementsByClassName('card'); // Obtenir toutes les cartes
+
+                    Array.from(cards).forEach(card => {
+                        const title = card.querySelector('.card-title').textContent.toLowerCase(); // Récupérer le titre de la carte
+                        const cardContainer = card.parentElement.parentElement.parentElement; // Accéder au div contenant la carte
+                        cardContainer.style.display = title.includes(query) ? 'block' : 'none'; // Afficher ou cacher la carte selon la recherche
+                    });
+                });
+            })
+            .catch(error => console.error('Error fetching Pokémon data:', error)); // Gestion des erreurs
+    });
+</script>
+{% endblock %}

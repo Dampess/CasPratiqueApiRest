@@ -1,0 +1,17 @@
+{# templates/pokemon/edit.html.twig #}
+{% extends 'base.html.twig' %}
+
+{% block title %}Modifier {{ pokemon.name|capitalize }}{% endblock %}
+
+{% block body %}
+    <div class="container mt-4">
+        <h1>Modifier le Pokémon : {{ pokemon.name|capitalize }}</h1>
+
+        {{ form_start(form) }}
+            {{ form_widget(form) }}
+            <button type="submit" class="btn btn-primary">Mettre à jour</button>
+        {{ form_end(form) }}
+
+        <a href="{{ path('pokemon', {'name': pokemon.name}) }}" class="btn btn-secondary mt-3">Retour</a>
+    </div>
+{% endblock %}

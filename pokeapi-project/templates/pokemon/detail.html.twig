@@ -1,0 +1,77 @@
+{# templates/pokemon/detail.html.twig #}
+{% extends 'base.html.twig' %}
+
+{% block title %}Détails du Pokémon - {{ pokemon.name|capitalize }}{% endblock %}
+
+{% block stylesheets %}
+    <style>
+        .pokemon-detail {
+            background-color: #f8f9fa; /* Couleur de fond légère pour la section de détail du Pokémon */
+            border-radius: 15px; /* Coins arrondis pour un aspect plus doux */
+            padding: 20px; /* Espacement interne pour une meilleure présentation */
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Ombre pour un effet de profondeur */
+            transition: transform 0.2s; /* Transition douce lors du survol */
+        }
+
+        .pokemon-detail:hover {
+            transform: scale(1.02); /* Agrandissement léger au survol pour attirer l'attention */
+        }
+
+        h1, h5 {
+            color: #343a40; /* Couleur des titres pour une bonne lisibilité */
+        }
+
+        ul {
+            list-style-type: none; /* Supprime les puces pour une liste plus propre */
+            padding-left: 0; /* Supprime le padding gauche de la liste */
+        }
+
+        li {
+            background: #007bff; /* Couleur de fond des items de liste */
+            color: white; /* Couleur du texte pour un bon contraste */
+            border-radius: 5px; /* Coins arrondis pour les items de liste */
+            margin-bottom: 5px; /* Espacement entre les items de liste */
+            padding: 8px; /* Espacement interne pour les items */
+        }
+
+        .btn-action {
+            margin-right: 10px; /* Espacement entre les boutons d'action */
+        }
+    </style>
+{% endblock %}
+
+{% block body %}
+    <div class="container mt-4">
+        <div class="pokemon-detail">
+            <h1>Détails du Pokémon : {{ pokemon.name|capitalize }}</h1>
+            <img src="{{ pokemon.sprites.front_default }}" alt="{{ pokemon.name }}" class="img-fluid" style="border-radius: 10px;"> <!-- Affichage de l'image du Pokémon -->
+            
+            <h5>Type(s):</h5>
+            <ul>
+                {% for type in pokemon.types %}
+                    <li>{{ type.type.name|capitalize }}</li> <!-- Affichage des types du Pokémon -->
+                {% endfor %}
+            </ul>
+            
+            <h5>Abilities:</h5>
+            <ul>
+                {% for ability in pokemon.abilities %}
+                    <li>{{ ability.ability.name|capitalize }}</li> <!-- Affichage des capacités du Pokémon -->
+                {% endfor %}
+            </ul>
+
+            <div class="mt-4">
+                <!-- Bouton pour modifier le Pokémon -->
+                <a href="{{ path('pokemon_edit', {'name': pokemon.name}) }}" class="btn btn-warning btn-action">Modifier</a>
+                
+                <!-- Formulaire pour supprimer le Pokémon -->
+                <form action="{{ path('pokemon_delete', {'name': pokemon.name}) }}" method="POST" style="display:inline;">
+                    <button type="submit" class="btn btn-danger btn-action">Supprimer</button>
+                </form>
+            </div>
+            
+            <!-- Bouton pour retourner à l'accueil -->
+            <a href="{{ path('home') }}" class="btn btn-primary mt-3">Retour à l'accueil</a>
+        </div>
+    </div>
+{% endblock %}

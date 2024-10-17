@@ -55,7 +55,7 @@ class PokemonController extends AbstractController
     {
         $pokemonsData = [];
         $totalPokemons = 150; // Nombre total de Pokémon à récupérer
-        $batchSize = 30; // Taille du lot
+        $batchSize = 40; // Taille du lot
 
         // Récupération par lot de Pokémon
         for ($id = 1; $id <= $totalPokemons; $id++) {
